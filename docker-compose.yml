@@ -1,0 +1,38 @@
+version: "3.7"
+services:
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: db
+    image: database
+    ports:
+      - 27017-27019:27017-27019
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: be
+    restart: always
+    image: be
+    ports:
+      - 5000:5000
+    depends_on:
+      - database
+    links:
+      - database
+    volumes:
+      - ./backend:/app/
+      - /app/node_modules
+    command: npm run start-dev
+  fe:
+    container_name: fe
+    image: fe
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    links:
+      - backend
+    volumes:
+      - ./frontend:/app/
